@@ -4,7 +4,6 @@ import { WebhookEvent } from '@clerk/nextjs/server'
 import { adminClient } from '../../../../sanity/adminClient'
 
 export async function POST(req: Request) {
-  // You can find this in the Clerk Dashboard -> Webhooks -> choose the webhook
   const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET
 
   if (!WEBHOOK_SECRET) {
@@ -17,7 +16,6 @@ export async function POST(req: Request) {
   const svix_timestamp = headerPayload.get("svix-timestamp");
   const svix_signature = headerPayload.get("svix-signature");
 
-  // If there are no headers, error out
   if (!svix_id || !svix_timestamp || !svix_signature) {
     return new Response('Error occured -- no svix headers', {
       status: 400
@@ -28,12 +26,10 @@ export async function POST(req: Request) {
   const payload = await req.json()
   const body = JSON.stringify(payload);
 
-  // Create a new Svix instance with your secret.
   const wh = new Webhook(WEBHOOK_SECRET);
 
   let evt: WebhookEvent
 
-  // Verify the payload with the headers
   try {
     evt = wh.verify(body, {
       "svix-id": svix_id,
@@ -51,7 +47,14 @@ export async function POST(req: Request) {
   const eventType = evt.type;
 
   if (eventType === 'user.created' || eventType === 'user.updated') {
-    const { id, email_addresses, first_name, last_name, image_url } = evt.data;
+    const {
+      id,
+      email_addresses,
+      first_name,
+      last_name,
+      username,
+      image_url
+    } = evt.data;
 
     const email = email_addresses[0]?.email_address;
 
@@ -61,8 +64,29 @@ export async function POST(req: Request) {
 
     try {
       const customerId = `customer-${id}`;
-      
-      // Ensure the user exists, then patch their latest info
+
+      // Build display name with priority: first_name+last_name > username > email prefix
+      let displayName = '';
+
+      if (first_name || last_name) {
+        displayName = `${first_name || ''} ${last_name || ''}`.trim();
+      } else if (username) {
+        displayName = username;
+      }
+
+      // Log webhook data for debugging
+      console.log('📥 Clerk Webhook received:', {
+        eventType,
+        userId: id,
+        email,
+        username,
+        first_name,
+        last_name,
+        displayName,
+        image_url
+      });
+
+      // Create or update user in Sanity
       await adminClient.transaction()
         .createIfNotExists({
           _type: 'customer',
@@ -72,15 +96,15 @@ export async function POST(req: Request) {
           createdAt: new Date().toISOString(),
         })
         .patch(customerId, (p) => p.set({
-          name: `${first_name || ''} ${last_name || ''}`.trim() || undefined,
+          name: displayName || undefined,
           profilePicture: image_url || undefined,
           email: email,
         }))
         .commit();
-        
-      console.log(`Successfully synced and updated user ${id} in Sanity`);
+
+      console.log(`✅ Successfully synced user ${id} to Sanity with name: "${displayName}"`);
     } catch (error) {
-      console.error('Error syncing user to Sanity:', error);
+      console.error('❌ Error syncing user to Sanity:', error);
       return new Response('Error syncing user to Sanity', { status: 500 });
     }
   }
