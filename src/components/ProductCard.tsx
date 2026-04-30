@@ -1,7 +1,11 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Tag } from 'lucide-react';
+"use client";
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { Tag, ShoppingCart } from 'lucide-react';
 import AddToCartButton from './AddToCartButton';
+import { client } from '../sanity/client';
+import { GET_STOCKS_OF_PRODUCT_BY_SLUG } from '../sanity/queries/products_query';
+
 
 export interface ProductType {
   id?: string | number;
@@ -21,26 +25,48 @@ export interface ProductType {
 }
 
 export default function ProductCard({ product }: { product: ProductType }) {
+  const [stock, setStock] = useState<number | null>(product.stock ?? null);
+
+  useEffect(() => {
+    const fetchStock = async () => {
+      if (!product.slug) return;
+      try {
+        const data = await client.fetch(GET_STOCKS_OF_PRODUCT_BY_SLUG, { slug: product.slug });
+        if (data && typeof data.stock === 'number') {
+          setStock(data.stock);
+        }
+      } catch (err) {
+        console.error("Failed to fetch stock for product", err);
+      }
+    };
+    fetchStock();
+  }, [product.slug]);
+
   const mainImage = product.images && product.images.length > 0 ? product.images[0] : 'https://via.placeholder.com/400x400?text=Sock';
 
-  const routeUrl = product.slug ? `/product/${product.slug}` : `/product/${product.id}`;
+  const routeUrl = product.slug ? `/sock/${product.slug}` : `/sock/${product.id}`;
 
   // Use a stable fallback ID if none is provided
   const productId = product.id || product.slug || `generated-id-${product.name.replace(/\s+/g, '-').toLowerCase()}`;
 
   return (
-    <Link to={routeUrl} className="w-[calc(100%+10px)] -ml-[5px] bg-white border-2 border-black rounded-lg p-1.5 shadow-[4px_4px_0px_#000] hover:shadow-[6px_6px_0px_#000] transition-all duration-300 group flex flex-col h-full min-h-[268px]">
-      
+    <Link href={routeUrl} className="w-full -ml-[5px] md:w-9/10 md:mx-auto bg-[#fbfbf2] border-2 border-black rounded-lg p-1.5 shadow-[4px_4px_0px_#000] hover:shadow-[6px_6px_0px_#000] transition-shadow duration-300 group flex flex-col h-full">
+
       {/* Image Container */}
-      <div className="relative w-full h-7/10 border-2 border-black rounded-md overflow-hidden mb-1.5 bg-white flex items-center justify-center">
-        <img 
+      <div className="relative w-full aspect-[2/3] border-2 border-black rounded-md overflow-hidden mb-1.5 bg-[#fbfbf2] flex items-center justify-center">
+        <img
           src={mainImage}
           alt={product.name}
           className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
         />
         {product.badge && (
-          <span className="absolute top-1 left-1 bg-black text-white font-display font-bold text-[8px] uppercase px-1.5 py-0.5 rounded z-10">
+          <span className="absolute top-1 left-1 bg-black text-white font-['Poppins'] font-bold text-[8px] uppercase px-1.5 py-0.5 rounded z-10">
             {product.badge}
+          </span>
+        )}
+        {stock !== null && (
+          <span className="absolute top-1 right-1 bg-red-500/80 backdrop-blur-md text-white font-['Poppins'] font-bold text-[8px] uppercase px-2 py-0.5 rounded-full z-10 border border-red-200/20 shadow-sm">
+            Only {stock} Left
           </span>
         )}
       </div>
@@ -48,29 +74,30 @@ export default function ProductCard({ product }: { product: ProductType }) {
       {/* Info Section */}
       <div className="flex-1 flex flex-col justify-between">
         <div>
-          <h3 className="font-display text-[10px] md:text-[11px] font-bold text-black leading-snug line-clamp-2 mb-0.5">
+          <h3 className="font-['Poppins'] text-[10px] md:text-[18px] font-bold text-black leading-snug line-clamp-2 mb-0.5">
             {product.name}
           </h3>
           <div className="mb-1.5 flex items-center gap-1">
             <Tag size={12} className="text-black fill-transparent" />
-            <span className="font-sans font-normal text-[12px] md:text-[14px] text-black">
+            <span className="font-['Poppins'] font-semibold text-[12px] md:text-[14px] text-black">
               ₹{product.price}
             </span>
           </div>
         </div>
 
         {/* Global Add to cart button replaces old hardcoded code */}
-        <AddToCartButton 
+        <AddToCartButton
           product={{
+            slug: product.slug,
             id: productId,
             name: product.name,
             price: product.price,
             image: mainImage
-          }} 
+          }}
           className="!w-full !h-7 !px-0 !py-0 !text-[9px] !rounded-2xl !mt-1"
         />
       </div>
-      
+
     </Link>
   );
 }

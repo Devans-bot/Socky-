@@ -41,7 +41,7 @@ const REVIEWS = [
 
 export default function ReviewsCarousel() {
   return (
-    <section className="py-16 bg-white w-full overflow-hidden border-t-4 border-black">
+    <section className="py-16 bg-[#fbfbf2] w-full overflow-hidden border-t-4 border-black">
       <div className="max-w-[1400px] mx-auto text-center mb-8 px-4">
         <h2 className="font-display text-3xl md:text-5xl uppercase text-black mb-4 font-black">WHAT OUR CUSTOMERS SAY</h2>
         <p className="font-sans text-lg font-bold text-black flex items-center justify-center gap-2">
@@ -49,45 +49,53 @@ export default function ReviewsCarousel() {
         </p>
       </div>
 
-      <div className="w-full relative group">
-        <div className="flex overflow-x-auto snap-x snap-mandatory hide-scrollbars pl-[5%] md:pl-[calc(50%-200px)] gap-6 pb-12 pt-4">
-          {REVIEWS.map((review) => (
-            <div 
-              key={review.id} 
-              className="snap-center shrink-0 w-[85vw] md:w-[400px] min-h-[280px] p-6 bg-white border-4 border-black rounded-2xl shadow-[8px_8px_0px_#000] hover:shadow-[12px_12px_0px_#000] hover:-translate-y-2 transition-all cursor-grab active:cursor-grabbing flex flex-col"
-            >
-              <div className="flex gap-1 mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <Star 
-                    key={i} 
-                    className={`w-6 h-6 ${i < review.rating ? 'fill-black text-black' : 'fill-white text-black'}`} 
-                  />
-                ))}
+      <div className="w-full relative overflow-hidden flex pb-12 pt-4 group">
+        {/* Two identical blocks to create the seamless infinite scroll effect */}
+        {[0, 1].map((blockIdx) => (
+          <div
+            key={blockIdx}
+            aria-hidden={blockIdx === 1 ? "true" : "false"}
+            className="flex flex-shrink-0 animate-marquee gap-6 px-3"
+          >
+            {REVIEWS.map((review) => (
+              <div
+                key={review.id}
+                className="shrink-0 w-[85vw] md:w-[400px] min-h-[280px] p-6 bg-[#fbfbf2] border-4 border-black rounded-2xl shadow-[8px_8px_0px_#000] hover:shadow-[12px_12px_0px_#000] hover:-translate-y-2 transition-all flex flex-col"
+              >
+                <div className="flex gap-1 mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`w-6 h-6 ${i < review.rating ? 'fill-black text-black' : 'fill-white text-black'}`}
+                    />
+                  ))}
+                </div>
+
+                <p className="font-sans text-lg font-medium text-black leading-relaxed flex-1 mb-4 italic">
+                  "{review.text}"
+                </p>
+
+                <div className="mt-auto flex items-center gap-2">
+                  <span className="font-display text-lg font-bold text-black uppercase">{review.name}</span>
+                  {review.verified && (
+                    <span className="font-sans text-xs flex items-center text-black font-bold border-2 border-black bg-[#fadadd] rounded-full px-2 py-0.5">
+                      ✓ Verified
+                    </span>
+                  )}
+                </div>
               </div>
-              
-              <p className="font-sans text-lg font-medium text-black leading-relaxed flex-1 mb-4 italic">
-                "{review.text}"
-              </p>
-              
-              <div className="mt-auto flex items-center gap-2">
-                <span className="font-display text-lg font-bold text-black uppercase">{review.name}</span>
-                {review.verified && (
-                  <span className="font-sans text-xs flex items-center text-black font-bold border-2 border-black bg-[#fadadd] rounded-full px-2 py-0.5">
-                    ✓ Verified
-                  </span>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ))}
       </div>
-      <style dangerouslySetInnerHTML={{__html: `
-        .hide-scrollbars {
-          -ms-overflow-style: none;  /* IE and Edge */
-          scrollbar-width: none;  /* Firefox */
+      <style dangerouslySetInnerHTML={{
+        __html: `
+        .animate-marquee {
+          animation: marquee 20s linear infinite;
         }
-        .hide-scrollbars::-webkit-scrollbar {
-          display: none;
+        @keyframes marquee {
+          0% { transform: translateX(0%); }
+          100% { transform: translateX(-100%); }
         }
       `}} />
     </section>

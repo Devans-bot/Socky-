@@ -7,6 +7,7 @@ export interface CartItem {
   price: number;
   image: string;
   quantity: number;
+  slug: string;
 }
 
 interface CartStore {
@@ -29,13 +30,13 @@ export const useCartStore = create<CartStore>()(
 
       openCart: () => set({ isCartOpen: true }),
       closeCart: () => set({ isCartOpen: false }),
-      
+
       addItem: (item) => set((state) => {
         const existingItem = state.items.find((i) => i.id === item.id);
         if (existingItem) {
           // If item exists, increase quantity
           return {
-            items: state.items.map((i) => 
+            items: state.items.map((i) =>
               i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
             )
           };

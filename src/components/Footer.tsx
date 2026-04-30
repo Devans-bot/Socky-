@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 
 export default function Footer() {
   return (
@@ -11,13 +11,13 @@ export default function Footer() {
 
         {/* Column 2: Contact Us */}
         <div>
-          <Link to="/"> <p className="hover:text-orange-400 transition-colors font-display font-black text-lg uppercase mb-4 text-[#fadadd]">CONTACT US</p> </Link>
+          <Link href="/"> <p className="hover:text-orange-400 transition-colors font-display font-black text-lg uppercase mb-4 text-[#fadadd]">CONTACT US</p> </Link>
           
         </div>
 
         {/* Column 3: Return Policy */}
         <div>
-          <Link to="/"><p className="font-display font-black text-lg uppercase mb-4 text-[#fadadd] hover:text-orange-400 transition-colors">RETURN POLICY</p></Link>
+          <Link href="/"><p className="font-display font-black text-lg uppercase mb-4 text-[#fadadd] hover:text-orange-400 transition-colors">RETURN POLICY</p></Link>
           
         </div>
 
@@ -43,11 +43,11 @@ export default function Footer() {
           © 2026 Sock🧦y. All rights reserved.
         </div>
         <div className="space-x-4 text-sm flex items-center">
-          <Link to="/" className="hover:text-orange-400">Privacy Policy</Link>
+          <Link href="/" className="hover:text-orange-400">Privacy Policy</Link>
           <span className="opacity-50">|</span>
-          <Link to="/" className="hover:text-orange-400">Terms of Service</Link>
+          <Link href="/" className="hover:text-orange-400">Terms of Service</Link>
           <span className="opacity-50">|</span>
-          <Link to="/" className="hover:text-orange-400">Accessibility</Link>
+          <Link href="/" className="hover:text-orange-400">Accessibility</Link>
         </div>
       </div>
     </footer>

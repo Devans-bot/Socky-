@@ -7,8 +7,8 @@ export default defineConfig({
   name: 'default',
   title: 'Socky E-commerce Studio',
   basePath: '/studio',
-  projectId: import.meta.env.VITE_SANITY_PROJECT_ID || 'w7ebp0qv',
-  dataset: import.meta.env.VITE_SANITY_DATASET || 'socks-data',
+  projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'w7ebp0qv',
+  dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'socks-data',
   plugins: [
     structureTool({
       structure: (S) =>
@@ -26,10 +26,10 @@ export default defineConfig({
                       .title('All Products')
                       .child(S.documentTypeList('product').title('All Products')),
                     S.listItem()
-                      .title('Categories')
+                      .title('Products by Category')
                       .child(
                         S.documentTypeList('category')
-                          .title('Categories')
+                          .title('Select Category')
                           .child((categoryId) =>
                             S.documentTypeList('product')
                               .id(`category-products-${categoryId}`)
@@ -74,6 +74,10 @@ export default defineConfig({
                       ),
                   ])
               ),
+            // Dedicated Categories item for editing names/descriptions
+            S.listItem()
+              .title('Categories')
+              .child(S.documentTypeList('category').title('Categories')),
             // Divider
             S.divider(),
             // All other document types except product and category

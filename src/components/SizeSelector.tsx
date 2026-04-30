@@ -18,7 +18,7 @@ export function SizeSelector() {
             className={`flex-1 h-12 flex items-center justify-center font-display text-lg border-2 border-black rounded-xl transition-all ${
               selected === size 
                 ? 'bg-black text-white shadow-[2px_2px_0px_#000]' 
-                : 'bg-white text-black hover:bg-gray-100 hover:shadow-[2px_2px_0px_#000]'
+                : 'bg-[#fbfbf2] text-black hover:bg-gray-100 hover:shadow-[2px_2px_0px_#000]'
             }`}
           >
             {size}

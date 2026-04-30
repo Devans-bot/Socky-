@@ -1,5 +1,6 @@
+"use client";
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { client } from '../sanity/client';
 import { GET_ALL_CATEGORY } from '../sanity/queries/categoriesQueries';
 
@@ -26,65 +27,82 @@ export function ShopCategories() {
         setLoading(false);
       }
     };
-    
+
     fetchCategories();
   }, []);
+
   return (
-    <section className="w-full max-w-[1400px] mx-auto px-4 py-8">
-      <div className="bg-[#cffafe]/20 border-4 border-black rounded-[32px] p-6 md:p-12 shadow-[8px_8px_0px_#000]">
-        <div className="flex justify-start mb-10 pb-4 border-black">
-          <h2 className="text-3xl md:text-5xl lg:text-6xl uppercase text-black font-normal tracking-wide font-luckiest">
-            Shop Sockss 🧦
-          </h2>
-        </div>
-        
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
-          {loading ? (
-            <div className="col-span-2 sm:col-span-3 lg:col-span-6 py-10 text-center font-luckiest text-2xl">
-               Loading Categories... 🧦
-            </div>
-          ) : (
-            <>
-              {categories.slice(0, 5).map((category) => (
-                <Link to={`/category/${category.slug}`} key={category._id}>
-                  <div className="relative cursor-pointer border-4 border-black rounded-[24px] overflow-hidden aspect-[4/5] bg-black shadow-[4px_4px_0_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-200 group">
-                    {category.imageUrl ? (
-                      <img 
-                        src={category.imageUrl} 
-                        alt={category.name} 
-                        className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-40 group-hover:scale-110 transition-all duration-500" 
-                      />
-                    ) : (
-                      <div className="absolute inset-0 w-full h-full bg-black/40"></div>
-                    )}
-                    <div className="absolute inset-0 flex items-center justify-center px-4">
-                      <h3 
-                        className="text-lg lg:text-xl text-white text-center font-normal tracking-wider  group-hover:scale-110 transition-transform duration-300"
-                        style={{ fontFamily: "'Luckiest Guy', cursive" }}
-                      >
-                        {category.name}
-                      </h3>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-              <Link to="/shop">
-                <div className="relative cursor-pointer border-4 border-black rounded-[24px] overflow-hidden aspect-[4/5] bg-[#fadadd] shadow-[4px_4px_0_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-200 group flex flex-col items-center justify-center">
-                  <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
-                     <span className="text-4xl md:text-5xl mb-4 group-hover:scale-110 transition-transform duration-300 drop-shadow-[2px_2px_0_rgba(0,0,0,0.3)]">🛒</span>
-                     <h3 
-                       className="text-lg lg:text-xl text-black text-center font-normal tracking-wider group-hover:scale-110 transition-transform duration-300"
-                       style={{ fontFamily: "'Luckiest Guy', cursive" }}
-                     >
-                       Shop All
-                     </h3>
+    <section className="w-full py-10 overflow-hidden">
+      <div className="px-4 mb-8">
+        <h2 className="text-2xl md:text-5xl uppercase text-black font-luckiest tracking-wide">
+          Shop Categories 🧦
+        </h2>
+      </div>
+
+      <div className="flex overflow-x-auto w-full gap-6 px-4 pb-8 no-scrollbar snap-x snap-mandatory">
+        {loading ? (
+          <div className="w-full py-12 text-center font-luckiest text-3xl animate-pulse">
+            Loading Categories...
+          </div>
+        ) : (
+          <>
+            {categories.map((category) => (
+              <Link
+                href={`/socks?category=${category.slug}`}
+                key={category._id}
+                className="flex-shrink-0 w-7/10 md:w-3/10 snap-start"
+              >
+                <div className="relative aspect-[16/9] border-4 border-black rounded-[32px] overflow-hidden group shadow-[8px_8px_0px_#000] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-300">
+                  {/* Background Image */}
+                  {category.imageUrl ? (
+                    <img
+                      src={category.imageUrl}
+                      alt={category.name}
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 w-full h-full bg-neutral-200" />
+                  )}
+
+                  {/* Faded Black Overlay */}
+                  <div className="absolute inset-0 bg-black/50 group-hover:bg-black/30 transition-colors duration-300" />
+
+                  {/* Category Name */}
+                  <div className="absolute inset-0 flex items-center justify-center p-6">
+                    <h3 className="text-3xl md:text-4xl text-white text-center font-luckiest drop-shadow-[3px_3px_0px_rgba(0,0,0,0.8)] tracking-wider">
+                      {category.name}
+                    </h3>
                   </div>
                 </div>
               </Link>
-            </>
-          )}
-        </div>
+            ))}
+
+            {/* View All Card */}
+            <Link href="/socks" className="flex-shrink-0 w-[200px] md:w-[250px] snap-start">
+              <div className="relative h-full border-4 border-black rounded-[32px] overflow-hidden group bg-[#fadadd] shadow-[8px_8px_0px_#000] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-300 flex flex-col items-center justify-center p-8">
+                <div className="bg-white border-2 border-black rounded-full p-4 mb-4 shadow-[2px_2px_0px_#000] group-hover:scale-110 transition-transform">
+                  <span className="text-4xl">🛒</span>
+                </div>
+                <h3 className="text-xl md:text-2xl text-black text-center font-luckiest uppercase">
+                  Shop All
+                </h3>
+              </div>
+            </Link>
+          </>
+        )}
       </div>
+
+      <style dangerouslySetInnerHTML={{
+        __html: `
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}} />
     </section>
   );
 }
+
