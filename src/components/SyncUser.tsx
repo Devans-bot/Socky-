@@ -18,6 +18,7 @@ export default function SyncUser() {
           email: email,
           firstName: user.firstName,
           lastName: user.lastName,
+          imageUrl: user.imageUrl,
         }).then((res) => {
           if (res.success) {
             hasSynced.current = true;

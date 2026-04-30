@@ -7,6 +7,7 @@ export async function syncUserToSanity(user: {
   email: string;
   firstName?: string | null;
   lastName?: string | null;
+  imageUrl?: string | null;
 }) {
   if (!user.id || !user.email) return { success: false, error: 'Missing user data' };
 
@@ -27,6 +28,7 @@ export async function syncUserToSanity(user: {
       _id: `customer-${user.id}`,
       email: user.email,
       name: `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+      profilePicture: user.imageUrl || undefined,
       clerkUserId: user.id,
       createdAt: new Date().toISOString(),
     });

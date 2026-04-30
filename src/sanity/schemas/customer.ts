@@ -24,6 +24,12 @@ export default defineType({
       description: "Customer's full name",
     }),
     defineField({
+      name: "profilePicture",
+      type: "url",
+      group: "details",
+      description: "URL to the customer's profile picture from Clerk",
+    }),
+    defineField({
       name: "clerkUserId",
       type: "string",
       group: "details",
