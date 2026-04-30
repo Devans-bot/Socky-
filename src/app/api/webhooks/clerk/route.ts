@@ -60,16 +60,25 @@ export async function POST(req: Request) {
     }
 
     try {
-      await adminClient.createIfNotExists({
-        _type: 'customer',
-        _id: `customer-${id}`,
-        email: email,
-        name: `${first_name || ''} ${last_name || ''}`.trim(),
-        profilePicture: image_url,
-        clerkUserId: id,
-        createdAt: new Date().toISOString(),
-      });
-      console.log(`Successfully synced user ${id} to Sanity`);
+      const customerId = `customer-${id}`;
+      
+      // Ensure the user exists, then patch their latest info
+      await adminClient.transaction()
+        .createIfNotExists({
+          _type: 'customer',
+          _id: customerId,
+          email: email,
+          clerkUserId: id,
+          createdAt: new Date().toISOString(),
+        })
+        .patch(customerId, (p) => p.set({
+          name: `${first_name || ''} ${last_name || ''}`.trim() || undefined,
+          profilePicture: image_url || undefined,
+          email: email,
+        }))
+        .commit();
+        
+      console.log(`Successfully synced and updated user ${id} in Sanity`);
     } catch (error) {
       console.error('Error syncing user to Sanity:', error);
       return new Response('Error syncing user to Sanity', { status: 500 });

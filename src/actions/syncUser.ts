@@ -12,26 +12,22 @@ export async function syncUserToSanity(user: {
   if (!user.id || !user.email) return { success: false, error: 'Missing user data' };
 
   try {
-    // Check if user already exists
-    const existingUser = await adminClient.fetch(
-      `*[_type == "customer" && clerkUserId == $id][0]`,
-      { id: user.id }
-    );
+    const customerId = `customer-${user.id}`;
 
-    if (existingUser) {
-      return { success: true, message: 'User already exists' };
-    }
-
-    // Create new customer if not found
-    await adminClient.create({
-      _type: 'customer',
-      _id: `customer-${user.id}`,
-      email: user.email,
-      name: `${user.firstName || ''} ${user.lastName || ''}`.trim(),
-      profilePicture: user.imageUrl || undefined,
-      clerkUserId: user.id,
-      createdAt: new Date().toISOString(),
-    });
+    // Use a transaction to ensure document exists, then patch it with latest info
+    await adminClient.transaction()
+      .createIfNotExists({
+        _type: 'customer',
+        _id: customerId,
+        email: user.email,
+        clerkUserId: user.id,
+        createdAt: new Date().toISOString(),
+      })
+      .patch(customerId, (p) => p.set({
+        name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || undefined,
+        profilePicture: user.imageUrl || undefined,
+      }))
+      .commit();
 
     return { success: true, message: 'User synced successfully' };
   } catch (error) {
