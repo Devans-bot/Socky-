@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState, useEffect, Suspense } from "react";
 import { X, FilterIcon, SlidersHorizontal, Check } from "lucide-react";
 import { COLORS, MATERIALS, SORT_OPTIONS } from "../lib/constants/filter";
 
@@ -15,7 +15,7 @@ interface FilterProps {
     categories?: Category[];
 }
 
-export const Filter = ({ categories = [] }: FilterProps) => {
+const FilterInner = ({ categories = [] }: FilterProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -243,5 +243,13 @@ export const Filter = ({ categories = [] }: FilterProps) => {
                 </div>
             </div>
         </>
+    );
+};
+
+export const Filter = (props: FilterProps) => {
+    return (
+        <Suspense fallback={<button className="w-10 h-10 bg-neutral-200 animate-pulse rounded-xl border-2 border-transparent"></button>}>
+            <FilterInner {...props} />
+        </Suspense>
     );
 };
