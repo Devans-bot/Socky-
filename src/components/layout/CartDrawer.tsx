@@ -129,9 +129,13 @@ export default function CartDrawer() {
               </div>
 
               <div className="flex items-center justify-center relative">
-                <button className="w-full bg-black text-white py-3.5 px-6 rounded-[24px] hover:bg-neutral-800 active:scale-[0.98] transition-all font-display font-black uppercase tracking-widest text-base md:text-lg text-center shadow-[4px_4px_0px_transparent] hover:shadow-[4px_4px_0px_#000] border-2 border-black border-transparent hover:border-black">
+                <Link
+                  href="/checkout"
+                  onClick={closeCart}
+                  className="w-full bg-black text-white py-3.5 px-6 rounded-[24px] hover:bg-neutral-800 active:scale-[0.98] transition-all font-display font-black uppercase tracking-widest text-base md:text-lg text-center shadow-[4px_4px_0px_transparent] hover:shadow-[4px_4px_0px_#000] border-2 border-black border-transparent hover:border-black"
+                >
                   CHECKOUT
-                </button>
+                </Link>
               </div>
 
               <button onClick={closeCart} className="mt-4 font-sans text-sm font-medium text-center w-full hover:text-gray-600 transition-colors text-black pb-1">

@@ -2,8 +2,31 @@ import { Webhook } from 'svix'
 import { headers } from 'next/headers'
 import { WebhookEvent } from '@clerk/nextjs/server'
 import { adminClient } from '../../../../sanity/adminClient'
+import { Ratelimit } from '@upstash/ratelimit'
+import { Redis } from '@upstash/redis'
+
+let ratelimit: Ratelimit | null = null
+try {
+  if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+    ratelimit = new Ratelimit({
+      redis: Redis.fromEnv(),
+      limiter: Ratelimit.slidingWindow(20, '1 m'),
+      analytics: false,
+    })
+  }
+} catch (e) {
+  console.warn("Upstash Redis not configured. Rate limiting disabled for Clerk Webhook.")
+}
 
 export async function POST(req: Request) {
+  if (ratelimit) {
+    const ip = req.headers.get('x-forwarded-for') ?? '127.0.0.1'
+    const { success } = await ratelimit.limit(`clerk-webhook-${ip}`)
+    if (!success) {
+      return new Response('Too many requests', { status: 429 })
+    }
+  }
+
   const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET
 
   if (!WEBHOOK_SECRET) {

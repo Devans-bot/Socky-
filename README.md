@@ -1,73 +1,50 @@
-# React + TypeScript + Vite
+# Socky - E-commerce Storefront
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Socky is a modern, full-featured e-commerce platform dedicated to selling socks. Built with a premium aesthetic and rich interactions, the application provides a seamless customer journey from browsing the product catalog to a complete checkout experience. It features robust user authentication, a sliding cart, and secure online payments via Razorpay (along with Cash on Delivery).
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+This project is built using a modern React ecosystem:
+- **Framework:** Next.js (App Router)
+- **Language:** TypeScript, React 19, Node.js
+- **Styling:** Tailwind CSS (v4), PostCSS, styled-components
+- **State Management:** Zustand
+- **Content Management (CMS):** Sanity
+- **Authentication:** Clerk
+- **Payment Gateway:** Razorpay
+- **Animations & UI:** GSAP, Embla Carousel React, Lucide React Icons
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Customer-Facing
+- **Authentication:** Secure Login and Sign Up flows powered by Clerk.
+- **Home & Browsing:** Dynamic home page featuring promotional carousels, new arrivals, product tickers, and user reviews.
+- **Product Catalog:** Comprehensive product listing with search functionality and rich filtering.
+- **Product Details:** Detailed product pages featuring interactive image galleries, size selectors, and Add to Cart functionality.
+- **Shopping Cart:** An interactive, slide-out cart drawer for easy order management.
+- **Checkout Flow:** A dedicated checkout page capturing delivery addresses and offering payment method selection (Online via Razorpay or Cash on Delivery).
+- **Order Confirmation:** Engaging success screens with order summaries and confetti animations.
+- **My Orders:** A gated dashboard for authenticated users to view their past orders.
+- **Order Tracking:** Detailed order views for customers showcasing a status timeline (Placed -> Packed -> Shipped -> Delivered) and live tracking links.
 
-## Expanding the ESLint configuration
+### Backend & API
+- **Order Processing:** Secure API routes (`/api/orders/create`) that construct Sanity order documents and initiate Razorpay checkout sessions.
+- **Payment Verification:** Server-side HMAC-SHA256 signature validation (`/api/razorpay/verify`) to securely confirm payments and update Sanity records.
+- **User Sync:** Clerk webhook listeners (`/api/webhooks/clerk`) that automatically mirror authenticated users into Sanity's customer database.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Data Model (Sanity Schemas)
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+The application uses Sanity as its backend database, with the following core document types implemented:
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- **`product`**: Defines the catalog items including name, slug, description, price, sale price, color schema, available sizes, material, stock levels, ratings, and image assets.
+- **`category`**: Defines taxonomic groupings for products.
+- **`customer`**: Stores user profiles synced from Clerk, including clerkId, email, name, and avatar URL.
+- **`order`**: The central record of a purchase. It contains the order number, customer references, subtotal/total calculations, payment mode (Online/COD), payment status, order status (Placed, Packed, Shipped, Delivered, Cancelled), Razorpay transaction IDs, tracking links, and full delivery address details.
+- **`orderItem`**: Represents individual line items within an order, capturing the specific product reference, selected size, quantity, and snapshot price.
+- **`shipping`**: Stores shipping configurations and rates.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Integrations
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- **Clerk:** Handles all user identity, authentication, session management, and secures protected routes (like checkout and order history).
+- **Sanity:** Serves as the headless CMS and primary database, housing all product data, user profiles, and order records.
+- **Razorpay:** The integrated payment gateway responsible for securely processing online transactions and returning verifiable payment signatures.

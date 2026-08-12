@@ -92,7 +92,7 @@ export default async function SocksPage({ searchParams }: PageProps) {
                 </div>
 
 
-                <div className="columns-2 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 md:gap-8 w-full max-w-[1400px] mx-auto">
+                <div className="columns-2 sm:columns-2 lg:columns-3 xl:columns-4 gap-3.5 md:gap-8 w-full max-w-[1400px] mx-auto">
                     {products?.map((product: any, index: number) => (
                         <div
                             key={product._id}

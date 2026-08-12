@@ -137,7 +137,7 @@ function HomePage() {
               </h2>
               <span className="text-2xl md:text-5xl">🔥</span>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-6">
               {bestsellers.map((product) => (
                 <ProductCard
                   key={`bestseller-${product._id}`}
